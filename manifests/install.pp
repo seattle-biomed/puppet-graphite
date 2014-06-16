@@ -1,22 +1,16 @@
 class graphite::install {
 
-  if $graphite::manage_python {
-    include python
-  } else {
-    ensure_packages(['python-pip'])
-  }
-
   ensure_packages([
-    'python-ldap',
     'python-cairo',
     'python-django',
-    'python-twisted',
     'python-django-tagging',
-    'python-simplejson',
-    'libapache2-mod-python',
+    'python-ldap',
     'python-memcache',
+    'python-pip',
     'python-pysqlite2',
+    'python-simplejson',
     'python-support',
+    'python-twisted',
   ])
 
   Package['python-pip'] -> Package <| provider == 'pip' and ensure != absent and ensure != purged |>
@@ -24,7 +18,7 @@ class graphite::install {
   package { ['whisper', 'carbon', 'graphite-web']:
     ensure   => installed,
     provider => pip,
-    require  => Class['python'],
+    require  => Package['python-pip'],
   }
 
   file { '/var/log/carbon':

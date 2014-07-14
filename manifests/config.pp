@@ -4,6 +4,7 @@ class graphite::config {
   $config_dir     = $graphite::config_dir
   $admin_password = $graphite::admin_password
   $port           = $graphite::port
+  $secret_key     = $graphite::secret_key
 
   file { '/etc/init.d/carbon':
     ensure => link,
@@ -18,7 +19,7 @@ class graphite::config {
 
   file { "${config_dir}/conf/carbon.conf":
     ensure    => present,
-    content   => template('graphite/carbon.conf'),
+    content   => template('graphite/carbon.conf.erb'),
   }
 
   file { "${config_dir}/conf/storage-schemas.conf":
@@ -42,25 +43,27 @@ class graphite::config {
   file { "${config_dir}/webapp/graphite/initial_data.json":
     ensure  => present,
     require => File["${config_dir}/storage"],
-    content => template('graphite/initial_data.json'),
+    content => template('graphite/initial_data.json.erb'),
   }
 
   file { "${config_dir}/storage/graphite.db":
     owner     => 'www-data',
     mode      => '0664',
-    subscribe => Exec['init-db'],
+    subscribe => Exec['init-graphite-db'],
   }
 
   file { "${config_dir}/storage/log/webapp/":
     ensure    => 'directory',
     owner     => 'www-data',
-    mode      => '0775',
-    subscribe => Package['graphite-web'],
+#    subscribe => Package['graphite-web'],
+    subscribe => Exec['pip-install-graphite-web'],
   }
 
   file { "${config_dir}/webapp/graphite/local_settings.py":
     ensure  => present,
-    source  => 'puppet:///modules/graphite/local_settings.py',
+    owner     => 'www-data',
+    mode      => '0550',
+    content => template('graphite/local_settings.py.erb'),
     require => File["${config_dir}/storage"]
   }
 

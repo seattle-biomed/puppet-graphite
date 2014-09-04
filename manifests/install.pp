@@ -37,21 +37,23 @@ class graphite::install {
   }
 
   file { '/var/log/carbon':
-    ensure => directory,
-    owner  => www-data,
-    group  => www-data,
+    ensure => 'directory',
+    owner  => 'www-data',
+    group  => 'root',
+    mode   => '0750',
   }
 
   file {'/var/lib/graphite':
-    ensure => directory,
-    owner  => www-data,
-    group  => www-data,
+    ensure => 'directory',
+    owner  => 'www-data',
+    group  => 'root',
+    mode   => '0750',
   }
 
   file {'/var/lib/graphite/db.sqlite3':
-    ensure => present,
-    owner  => www-data,
-    group  => www-data,
+    ensure => 'present',
+    owner  => 'www-data',
+    group  => 'www-data',
   }
 
 }
